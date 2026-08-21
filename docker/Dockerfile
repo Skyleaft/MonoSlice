@@ -26,8 +26,8 @@ RUN dotnet publish -c Release -r linux-x64 --self-contained \
     -p:StripSymbols=true \
     -o /out
 
-# Stage 2: Ultra-lightweight Chiseled / Distroless Runtime (~35MB total image size)
-FROM mcr.microsoft.com/dotnet/runtime-deps:10.0-noble-chiseled AS runtime
+# Stage 2: Ultra-lightweight Chiseled / Distroless Runtime with ICU support (~40MB total image size)
+FROM mcr.microsoft.com/dotnet/runtime-deps:10.0-noble-chiseled-extra AS runtime
 WORKDIR /app
 
 EXPOSE 8080

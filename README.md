@@ -153,6 +153,32 @@ src/Modules/MonoSlice.Modules.Catalog/Features/CreateProduct/
 
 ---
 
+## ⚡ Native AOT & EF Core Compiled Models
+
+MonoSlice is fully configured for **Native AOT (Ahead-of-Time compilation)** in .NET 10, resulting in ultra-fast cold starts (~10ms) and minimal memory footprints (~35-40MB container images):
+
+1. **Source-Generated JSON & Mediator**:
+   - `AppJsonSerializerContext` provides compile-time JSON metadata for all CQRS commands, queries, responses, and OpenAPI documentation without reflection.
+   - `Mediator.SourceGenerator` generates typed dispatch pipelines at build time.
+2. **EF Core Compiled Models**:
+   - Runtime model building is disabled in AOT mode. Compiled models are generated using `dotnet ef dbcontext optimize --nativeaot` and registered with `options.UseModel(...)`.
+   - To regenerate compiled models after modifying domain entities:
+     ```bash
+     # Users Module
+     dotnet ef dbcontext optimize --output-dir Persistence/CompiledModels --namespace MonoSlice.Modules.Users.Persistence.CompiledModels --context UsersDbContext --project src/Modules/MonoSlice.Modules.Users/MonoSlice.Modules.Users.csproj --startup-project src/MonoSlice.Host/MonoSlice.Host.csproj --nativeaot
+
+     # Catalog Module
+     dotnet ef dbcontext optimize --output-dir Persistence/CompiledModels --namespace MonoSlice.Modules.Catalog.Persistence.CompiledModels --context CatalogDbContext --project src/Modules/MonoSlice.Modules.Catalog/MonoSlice.Modules.Catalog.csproj --startup-project src/MonoSlice.Host/MonoSlice.Host.csproj --nativeaot
+     ```
+3. **Trimmer Root Directives (`rd.xml`)**:
+   - Preserves ASP.NET Core Identity generic store/manager type definitions during trimming.
+4. **Publishing Native AOT Binary**:
+   ```bash
+   dotnet publish src/MonoSlice.Host/MonoSlice.Host.csproj -c Release -r linux-x64
+   ```
+
+---
+
 ## 🧪 Testing Strategy
 
 - **Unit Tests**: Test handlers in isolation with `NSubstitute` mocks and in-memory EF Core.

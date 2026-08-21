@@ -20,6 +20,12 @@ builder.Configuration.AddEnvironmentVariables();
 builder.Services.AddMonoSliceOpenTelemetry(builder.Configuration);
 builder.Logging.AddMonoSliceOtelLogging(builder.Configuration);
 
+// JSON Serialization Context for Native AOT & OpenAPI
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.TypeInfoResolverChain.Insert(0, MonoSlice.Host.AppJsonSerializerContext.Default);
+});
+
 // OpenAPI & Scalar Documentation
 builder.Services.AddOpenApi();
 
