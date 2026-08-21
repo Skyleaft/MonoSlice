@@ -8,6 +8,7 @@ using MonoSlice.Modules.Orders.Domain;
 using MonoSlice.Modules.Orders.Features.CancelOrder;
 using MonoSlice.Modules.Orders.Features.CreateOrder;
 using MonoSlice.Modules.Orders.Features.GetOrder;
+using MonoSlice.Modules.Orders.Features.GetOrderAnalytics;
 using MonoSlice.Modules.Orders.Features.ListOrders;
 using MonoSlice.Modules.Orders.Features.ProcessOrderAsync;
 using MonoSlice.Modules.Users.Features.AssignRole;
@@ -58,6 +59,15 @@ namespace MonoSlice.Host;
 [JsonSerializable(typeof(ProcessOrderAsyncCommand))]
 [JsonSerializable(typeof(CancelOrderCommand))]
 [JsonSerializable(typeof(CancelOrderRequest))]
+[JsonSerializable(typeof(GetOrderAnalyticsQuery))]
+[JsonSerializable(typeof(ApiResponse<OrderAnalyticsDto>))]
+[JsonSerializable(typeof(OrderAnalyticsDto))]
+[JsonSerializable(typeof(OrderStatusBreakdownDto))]
+[JsonSerializable(typeof(List<OrderStatusBreakdownDto>))]
+[JsonSerializable(typeof(IReadOnlyList<OrderStatusBreakdownDto>))]
+[JsonSerializable(typeof(TopPurchasedProductDto))]
+[JsonSerializable(typeof(List<TopPurchasedProductDto>))]
+[JsonSerializable(typeof(IReadOnlyList<TopPurchasedProductDto>))]
 [JsonSerializable(typeof(int))]
 [JsonSerializable(typeof(int?))]
 [JsonSerializable(typeof(bool))]

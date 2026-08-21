@@ -8,6 +8,7 @@ using MonoSlice.Modules.Orders.EventHandlers;
 using MonoSlice.Modules.Orders.Features.CancelOrder;
 using MonoSlice.Modules.Orders.Features.CreateOrder;
 using MonoSlice.Modules.Orders.Features.GetOrder;
+using MonoSlice.Modules.Orders.Features.GetOrderAnalytics;
 using MonoSlice.Modules.Orders.Features.ListOrders;
 using MonoSlice.Modules.Orders.Features.ProcessOrderAsync;
 using MonoSlice.Modules.Orders.Persistence;
@@ -72,6 +73,7 @@ public static class OrdersModule
         group.MapListOrdersEndpoint();
         group.MapProcessOrderAsyncEndpoint();
         group.MapCancelOrderEndpoint();
+        group.MapGetOrderAnalyticsEndpoint();
 
         return app;
     }

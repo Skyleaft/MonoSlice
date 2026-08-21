@@ -11,6 +11,7 @@ using MonoSlice.Shared.Infrastructure.Messaging;
 using MonoSlice.Shared.Infrastructure.Messaging.Kafka;
 using MonoSlice.Shared.Infrastructure.Messaging.RabbitMQ;
 using MonoSlice.Shared.Infrastructure.Middleware;
+using MonoSlice.Shared.Infrastructure.Persistence;
 
 namespace MonoSlice.Shared.Infrastructure;
 
@@ -23,6 +24,7 @@ public static class ServiceCollectionExtensions
         services.AddCaching(configuration);
         services.AddMessaging(configuration);
         services.AddMediatorBehaviors();
+        services.AddDapper(configuration);
 
         return services;
     }

@@ -34,8 +34,6 @@ public sealed class RequestLoggingMiddleware
             var path = context.Request.Path;
             var method = context.Request.Method;
 
-            _logger.LogInformation("HTTP {Method} {Path} started", method, path);
-
             try
             {
                 await _next(context);
