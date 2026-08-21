@@ -38,14 +38,16 @@ MonoSlice/
 ├── src/
 │   ├── MonoSlice.Host/                    # Composition root & API host
 │   ├── MonoSlice.Shared/
-│   │   ├── MonoSlice.Shared.Abstractions/ # Core interfaces, CQRS, DDD base types
+│   │   ├── MonoSlice.Shared.Abstractions/ # Core interfaces, CQRS, DDD base types, Contracts, Events
 │   │   └── MonoSlice.Shared.Infrastructure/ # Caching, Messaging, Middleware, Behaviors
 │   └── Modules/
-│       ├── MonoSlice.Modules.Users/       # Identity, JWT, Cookie auth, Role management
-│       └── MonoSlice.Modules.Catalog/     # Sample domain module with CRUD & events
+│       ├── MonoSlice.Modules.Users/       # Identity, JWT, Cookie auth, Role management & UsersModuleApi
+│       ├── MonoSlice.Modules.Catalog/     # Catalog domain, stock management, CatalogModuleApi & async consumers
+│       └── MonoSlice.Modules.Orders/      # Orders domain, sync/async inter-module communication & background worker
 ├── tests/
 │   ├── MonoSlice.Modules.Users.Tests/    # Users module unit tests
 │   ├── MonoSlice.Modules.Catalog.Tests/  # Catalog module unit tests
+│   ├── MonoSlice.Modules.Orders.Tests/   # Orders module unit tests
 │   └── MonoSlice.IntegrationTests/       # Full integration tests with WebApplicationFactory
 ├── docker/
 │   ├── Dockerfile                        # Multi-stage container build
@@ -54,12 +56,20 @@ MonoSlice/
 └── README.md
 ```
 
-### Module Boundary Separation
-Each module is a standalone class library containing:
-- Its own **DbContext** and domain tables.
-- Its own **Vertical Slices** (features).
-- Clean dependency only on `MonoSlice.Shared.Abstractions` and `MonoSlice.Shared.Infrastructure`.
-- Cross-module communication via asynchronous **Integration Events** over RabbitMQ/Kafka.
+### Module Boundary Separation & Inter-Module Communication
+MonoSlice demonstrates three distinct patterns of decoupling and communication:
+
+1. **Synchronous Inter-Module Queries (Contract-Based)**:
+   - Modules do **not** reference private internal entities or `DbContext` of other modules.
+   - Modules expose public contract interfaces registered in DI (e.g. `ICatalogModuleApi`, `IUsersModuleApi` in `MonoSlice.Shared.Abstractions/Contracts`).
+   - When placing an order, `MonoSlice.Modules.Orders` synchronously queries `ICatalogModuleApi` for product pricing and stock availability, and `IUsersModuleApi` for customer status validation.
+
+2. **Asynchronous Inter-Module Messaging (Event-Driven)**:
+   - For state changes and side effects across modules, modules publish `IntegrationEvent` records via `IEventBus` (RabbitMQ / Kafka / In-Memory).
+   - When an order is placed, `OrderPlacedIntegrationEvent` is published; `MonoSlice.Modules.Catalog` consumes this event asynchronously via `OrderPlacedIntegrationEventHandler` to decrement inventory.
+
+3. **Asynchronous In-Process Background Queue Processing**:
+   - For heavy background workloads (payment fulfillment simulation, invoice generation, fraud checks), `MonoSlice.Modules.Orders` leverages a non-blocking `Channel<T>` queue (`IOrderProcessingQueue`) consumed by a dedicated `OrderProcessingBackgroundService` worker without stalling HTTP requests.
 
 ---
 
@@ -105,6 +115,7 @@ Every setting can be overridden via environment variables or `.env`:
 |---|---|---|
 | `ConnectionStrings__UsersDb` | `Host=localhost;Database=monoslice_users...` | PostgreSQL connection string for Users module |
 | `ConnectionStrings__CatalogDb` | `Host=localhost;Database=monoslice_catalog...` | PostgreSQL connection string for Catalog module |
+| `ConnectionStrings__OrdersDb` | `Host=localhost;Database=monoslice_orders...` | PostgreSQL connection string for Orders module |
 | `Auth__JwtSecret` | `MonoSlice_Super_Secret_Key...` | Symmetric secret key for JWT signing |
 | `Auth__AccessTokenExpiryMinutes` | `60` | JWT expiration time in minutes |
 | `Auth__EnableCookieAuth` | `true` | Enables cookie-based fallback authentication |
@@ -137,6 +148,15 @@ Every setting can be overridden via environment variables or `.env`:
 | `POST` | `/api/catalog/products` | Create product (publishes async event) | Admin, Manager |
 | `PUT` | `/api/catalog/products/{id}` | Update product details | Admin, Manager |
 | `DELETE` | `/api/catalog/products/{id}` | Delete product | Admin only |
+
+### 🛒 Orders Module (`/api/orders`)
+| Method | Endpoint | Description | Auth |
+|---|---|---|---|
+| `POST` | `/api/orders` | Create order (Sync inter-module check, async event + queue) | Anonymous |
+| `GET` | `/api/orders/{id}` | Get order details and items | Anonymous |
+| `GET` | `/api/orders` | List orders with pagination and status filter | Anonymous |
+| `POST` | `/api/orders/{id}/process-async` | Trigger async background fulfillment job | Anonymous |
+| `POST` | `/api/orders/{id}/cancel` | Cancel a pending/processing order | Anonymous |
 
 ---
 

@@ -20,7 +20,6 @@ public sealed class LoggingBehavior<TMessage, TResponse> : IPipelineBehavior<TMe
         CancellationToken cancellationToken)
     {
         var requestName = typeof(TMessage).Name;
-        _logger.LogInformation("Handling {RequestName}", requestName);
 
         var stopwatch = Stopwatch.StartNew();
 

@@ -4,6 +4,12 @@ using MonoSlice.Modules.Catalog.Features.DeleteProduct;
 using MonoSlice.Modules.Catalog.Features.GetProduct;
 using MonoSlice.Modules.Catalog.Features.ListProducts;
 using MonoSlice.Modules.Catalog.Features.UpdateProduct;
+using MonoSlice.Modules.Orders.Domain;
+using MonoSlice.Modules.Orders.Features.CancelOrder;
+using MonoSlice.Modules.Orders.Features.CreateOrder;
+using MonoSlice.Modules.Orders.Features.GetOrder;
+using MonoSlice.Modules.Orders.Features.ListOrders;
+using MonoSlice.Modules.Orders.Features.ProcessOrderAsync;
 using MonoSlice.Modules.Users.Features.AssignRole;
 using MonoSlice.Modules.Users.Features.GetProfile;
 using MonoSlice.Modules.Users.Features.Login;
@@ -21,6 +27,9 @@ namespace MonoSlice.Host;
 [JsonSerializable(typeof(ApiResponse<ProductDto>))]
 [JsonSerializable(typeof(ApiResponse<PaginatedList<ProductDto>>))]
 [JsonSerializable(typeof(PaginatedList<ProductDto>))]
+[JsonSerializable(typeof(ApiResponse<OrderDto>))]
+[JsonSerializable(typeof(ApiResponse<PaginatedList<OrderDto>>))]
+[JsonSerializable(typeof(PaginatedList<OrderDto>))]
 [JsonSerializable(typeof(RegisterCommand))]
 [JsonSerializable(typeof(UserResponseDto))]
 [JsonSerializable(typeof(LoginCommand))]
@@ -36,6 +45,19 @@ namespace MonoSlice.Host;
 [JsonSerializable(typeof(DeleteProductCommand))]
 [JsonSerializable(typeof(GetProductQuery))]
 [JsonSerializable(typeof(ListProductsQuery))]
+[JsonSerializable(typeof(CreateOrderCommand))]
+[JsonSerializable(typeof(CreateOrderItemDto))]
+[JsonSerializable(typeof(List<CreateOrderItemDto>))]
+[JsonSerializable(typeof(OrderDto))]
+[JsonSerializable(typeof(OrderItemDto))]
+[JsonSerializable(typeof(List<OrderItemDto>))]
+[JsonSerializable(typeof(IReadOnlyList<OrderItemDto>))]
+[JsonSerializable(typeof(OrderStatus))]
+[JsonSerializable(typeof(GetOrderQuery))]
+[JsonSerializable(typeof(ListOrdersQuery))]
+[JsonSerializable(typeof(ProcessOrderAsyncCommand))]
+[JsonSerializable(typeof(CancelOrderCommand))]
+[JsonSerializable(typeof(CancelOrderRequest))]
 [JsonSerializable(typeof(int))]
 [JsonSerializable(typeof(int?))]
 [JsonSerializable(typeof(bool))]

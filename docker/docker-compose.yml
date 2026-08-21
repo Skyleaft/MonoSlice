@@ -10,6 +10,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__UsersDb=Host=postgres;Port=5432;Database=monoslice_users;Username=postgres;Password=postgres
       - ConnectionStrings__CatalogDb=Host=postgres;Port=5432;Database=monoslice_catalog;Username=postgres;Password=postgres
+      - ConnectionStrings__OrdersDb=Host=postgres;Port=5432;Database=monoslice_orders;Username=postgres;Password=postgres
       - Cache__Provider=Redis
       - Cache__Redis__ConnectionString=redis:6379
       - Messaging__Provider=RabbitMQ
@@ -37,7 +38,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_MULTIPLE_DATABASES: monoslice_users,monoslice_catalog
+      POSTGRES_MULTIPLE_DATABASES: monoslice_users,monoslice_catalog,monoslice_orders
       PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
       - pgdata:/var/lib/postgresql/data

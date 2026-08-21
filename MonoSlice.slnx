@@ -4,6 +4,7 @@
   </Folder>
   <Folder Name="/src/Modules/">
     <Project Path="src/Modules/MonoSlice.Modules.Catalog/MonoSlice.Modules.Catalog.csproj" />
+    <Project Path="src/Modules/MonoSlice.Modules.Orders/MonoSlice.Modules.Orders.csproj" />
     <Project Path="src/Modules/MonoSlice.Modules.Users/MonoSlice.Modules.Users.csproj" />
   </Folder>
   <Folder Name="/src/Shared/">
@@ -13,6 +14,7 @@
   <Folder Name="/tests/">
     <Project Path="tests/MonoSlice.IntegrationTests/MonoSlice.IntegrationTests.csproj" />
     <Project Path="tests/MonoSlice.Modules.Catalog.Tests/MonoSlice.Modules.Catalog.Tests.csproj" />
+    <Project Path="tests/MonoSlice.Modules.Orders.Tests/MonoSlice.Modules.Orders.Tests.csproj" />
     <Project Path="tests/MonoSlice.Modules.Users.Tests/MonoSlice.Modules.Users.Tests.csproj" />
   </Folder>
 </Solution>

@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using MonoSlice.Modules.Users.Auth;
+using MonoSlice.Modules.Users.Contracts;
 using MonoSlice.Modules.Users.Domain;
 using MonoSlice.Modules.Users.Features.AssignRole;
 using MonoSlice.Modules.Users.Features.GetProfile;
@@ -16,6 +17,7 @@ using MonoSlice.Modules.Users.Features.Login;
 using MonoSlice.Modules.Users.Features.RefreshToken;
 using MonoSlice.Modules.Users.Features.Register;
 using MonoSlice.Modules.Users.Persistence;
+using MonoSlice.Shared.Abstractions.Contracts;
 using MonoSlice.Shared.Abstractions.Interfaces;
 
 namespace MonoSlice.Modules.Users;
@@ -95,6 +97,7 @@ public static class UsersModule
 
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUser, CurrentUserService>();
+        services.AddScoped<IUsersModuleApi, UsersModuleApi>();
         services.AddSingleton<IJwtTokenService, JwtTokenService>();
         services.AddHostedService<SeedRolesService>();
 

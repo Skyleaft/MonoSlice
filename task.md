@@ -58,9 +58,26 @@
 - [x] Features — ListProducts (pagination + search)
 - [x] Features — UpdateProduct (cache invalidation)
 - [x] Features — DeleteProduct
-- [x] Integration event handler (native async consumer)
+- [x] Contracts — ICatalogModuleApi / CatalogModuleApi (synchronous inter-module query API)
+- [x] Integration event handlers (ProductCreated, OrderPlaced stock decrement)
 - [x] In-process domain event handler
 - [x] Module registration (AddCatalogModule / MapCatalogEndpoints)
+
+## Orders Module (Sample Async & Inter-Module Communication)
+- [x] Project file
+- [x] Domain — Order, OrderItem, OrderStatus, OrderDomainEvents
+- [x] Persistence — OrdersDbContext + schema `orders`
+- [x] Services — IOrderProcessingQueue / OrderProcessingChannelQueue (Channel-based async queue)
+- [x] Services — OrderProcessingBackgroundService (Background fulfillment & integration event emission)
+- [x] Contracts — Synchronous queries to ICatalogModuleApi & IUsersModuleApi
+- [x] Features — CreateOrder (sync checks + async event + background queue)
+- [x] Features — GetOrder
+- [x] Features — ListOrders (pagination + filter)
+- [x] Features — ProcessOrderAsync (on-demand async background queue trigger)
+- [x] Features — CancelOrder
+- [x] Integration event handler (OrderCompleted)
+- [x] In-process domain event handlers (OrderCreated, OrderStatusChanged)
+- [x] Module registration (AddOrdersModule / MapOrdersEndpoints)
 
 ## Host Project
 - [x] Project file with Mediator.SourceGenerator
@@ -76,6 +93,7 @@
 ## Tests
 - [x] Users module unit tests (RegisterCommandHandler)
 - [x] Catalog module unit tests (Domain & CommandHandler)
+- [x] Orders module unit tests (Domain, CreateOrderCommandHandler, ChannelQueue)
 - [x] Integration tests project (WebApplicationFactory)
 
 ## Documentation

@@ -6,9 +6,12 @@ namespace MonoSlice.Shared.Infrastructure.Serialization;
 
 [JsonSerializable(typeof(ApiResponse))]
 [JsonSerializable(typeof(ApiResponse<string>))]
+[JsonSerializable(typeof(Result))]
+[JsonSerializable(typeof(Error))]
 [JsonSerializable(typeof(IReadOnlyList<string>))]
 [JsonSerializable(typeof(List<string>))]
 [JsonSerializable(typeof(string[]))]
+[JsonSerializable(typeof(int))]
 [JsonSourceGenerationOptions(
     PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase,
     DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull)]

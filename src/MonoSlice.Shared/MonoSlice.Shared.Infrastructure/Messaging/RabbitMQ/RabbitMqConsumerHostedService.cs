@@ -109,16 +109,38 @@ public sealed class RabbitMqConsumerHostedService : BackgroundService
 
     public override async Task StopAsync(CancellationToken cancellationToken)
     {
-        if (_channel is not null)
+        try
         {
-            await _channel.CloseAsync(cancellationToken);
-            _channel.Dispose();
+            if (_channel is { IsOpen: true })
+            {
+                await _channel.CloseAsync(cancellationToken);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogDebug(ex, "Channel already closed or failed to close.");
+        }
+        finally
+        {
+            _channel?.Dispose();
+            _channel = null;
         }
 
-        if (_connection is not null)
+        try
         {
-            await _connection.CloseAsync(cancellationToken);
-            _connection.Dispose();
+            if (_connection is { IsOpen: true })
+            {
+                await _connection.CloseAsync(cancellationToken);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogDebug(ex, "Connection already closed or failed to close.");
+        }
+        finally
+        {
+            _connection?.Dispose();
+            _connection = null;
         }
 
         await base.StopAsync(cancellationToken);

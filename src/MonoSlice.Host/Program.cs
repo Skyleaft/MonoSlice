@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using MonoSlice.Modules.Catalog;
 using MonoSlice.Modules.Catalog.Persistence;
+using MonoSlice.Modules.Orders;
+using MonoSlice.Modules.Orders.Persistence;
 using MonoSlice.Modules.Users;
 using MonoSlice.Modules.Users.Persistence;
 using MonoSlice.Shared.Infrastructure;
@@ -36,7 +38,8 @@ builder.Services.AddSharedInfrastructure(builder.Configuration);
 builder.Services.AddMonoSliceMapping(
     typeof(Program).Assembly,
     typeof(UsersModule).Assembly,
-    typeof(CatalogModule).Assembly);
+    typeof(CatalogModule).Assembly,
+    typeof(OrdersModule).Assembly);
 
 // Source-Generated Mediator Dispatcher
 builder.Services.AddMediator(options =>
@@ -47,6 +50,7 @@ builder.Services.AddMediator(options =>
 // Domain Modules
 builder.Services.AddUsersModule(builder.Configuration);
 builder.Services.AddCatalogModule(builder.Configuration);
+builder.Services.AddOrdersModule(builder.Configuration);
 
 // Health Checks
 builder.Services.AddHealthChecks();
@@ -92,6 +96,9 @@ using (var scope = app.Services.CreateScope())
         var catalogDb = scope.ServiceProvider.GetRequiredService<CatalogDbContext>();
         await catalogDb.Database.EnsureCreatedAsync();
 
+        var ordersDb = scope.ServiceProvider.GetRequiredService<OrdersDbContext>();
+        await ordersDb.Database.EnsureCreatedAsync();
+
         logger.LogInformation("Database schemas ensured successfully.");
     }
     catch (Exception ex)
@@ -127,8 +134,10 @@ app.MapGet("/", () => Results.Redirect("/scalar"))
 // Module Endpoints
 app.MapUsersEndpoints();
 app.MapCatalogEndpoints();
+app.MapOrdersEndpoints();
 
 app.Run();
 
 // Marker class for WebApplicationFactory in integration tests
 public partial class Program { }
+
