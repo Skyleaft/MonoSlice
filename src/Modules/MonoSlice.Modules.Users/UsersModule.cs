@@ -38,7 +38,6 @@ public static class UsersModule
         {
             services.AddDbContext<UsersDbContext>(options =>
             {
-                options.UseModel(MonoSlice.Modules.Users.Persistence.CompiledModels.UsersDbContextModel.Instance);
                 options.UseInMemoryDatabase(connectionString[9..]);
             });
         }
@@ -46,7 +45,6 @@ public static class UsersModule
         {
             services.AddDbContext<UsersDbContext>(options =>
             {
-                options.UseModel(MonoSlice.Modules.Users.Persistence.CompiledModels.UsersDbContextModel.Instance);
                 options.UseNpgsql(connectionString, npgsqlOptions =>
                 {
                     npgsqlOptions.MigrationsHistoryTable("__EFMigrationsHistory", UsersDbContext.DefaultSchema);

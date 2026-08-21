@@ -1,9 +1,6 @@
-# Stage 1: Build & Native AOT Compile
+# Stage 1: Build & Publish with IL Trimming
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /app
-
-# Install native compilation dependencies (clang compiler, zlib development headers)
-RUN apt-get update && apt-get install -y clang zlib1g-dev
 
 # Copy solution and project files for caching restore layer
 COPY MonoSlice.slnx ./
@@ -18,15 +15,16 @@ COPY src/MonoSlice.Host/*.csproj ./src/MonoSlice.Host/
 
 RUN dotnet restore -r linux-x64 src/MonoSlice.Host/MonoSlice.Host.csproj
 
-# Copy source tree and compile to native AOT binary
+# Copy source tree and publish self-contained trimmed binary
 COPY . .
 WORKDIR /app/src/MonoSlice.Host
 RUN dotnet publish -c Release -r linux-x64 --self-contained \
-    -p:PublishAot=true \
+    -p:PublishTrimmed=true \
+    -p:TrimMode=partial \
     -p:StripSymbols=true \
     -o /out
 
-# Stage 2: Ultra-lightweight Chiseled / Distroless Runtime with ICU support (~40MB total image size)
+# Stage 2: Ultra-lightweight Chiseled / Distroless Runtime with ICU support (~60MB total image size)
 FROM mcr.microsoft.com/dotnet/runtime-deps:10.0-noble-chiseled-extra AS runtime
 WORKDIR /app
 
@@ -36,5 +34,5 @@ ENV ASPNETCORE_ENVIRONMENT=Production
 
 COPY --from=build /out .
 
-# Run native compiled Linux binary directly without .NET runtime
+# Run self-contained executable directly
 ENTRYPOINT ["./MonoSlice.Host"]

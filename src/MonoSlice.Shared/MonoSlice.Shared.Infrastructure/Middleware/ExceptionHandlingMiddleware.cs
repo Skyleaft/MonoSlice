@@ -7,17 +7,14 @@ using Microsoft.Extensions.Logging;
 using MonoSlice.Shared.Abstractions.Common;
 using MonoSlice.Shared.Abstractions.Exceptions;
 
+using MonoSlice.Shared.Infrastructure.Serialization;
+
 namespace MonoSlice.Shared.Infrastructure.Middleware;
 
 public sealed class ExceptionHandlingMiddleware
 {
     private readonly RequestDelegate _next;
     private readonly ILogger<ExceptionHandlingMiddleware> _logger;
-
-    private static readonly JsonSerializerOptions JsonOptions = new()
-    {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-    };
 
     public ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
     {
@@ -83,6 +80,6 @@ public sealed class ExceptionHandlingMiddleware
         context.Response.ContentType = "application/json";
         context.Response.StatusCode = (int)statusCode;
 
-        await context.Response.WriteAsync(JsonSerializer.Serialize(response, JsonOptions));
+        await context.Response.WriteAsync(JsonSerializer.Serialize(response, SharedJsonSerializerContext.DefaultOptions));
     }
 }

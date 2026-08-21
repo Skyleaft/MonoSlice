@@ -31,7 +31,6 @@ public static class CatalogModule
         {
             services.AddDbContext<CatalogDbContext>(options =>
             {
-                options.UseModel(MonoSlice.Modules.Catalog.Persistence.CompiledModels.CatalogDbContextModel.Instance);
                 options.UseInMemoryDatabase(connectionString[9..]);
             });
         }
@@ -39,7 +38,6 @@ public static class CatalogModule
         {
             services.AddDbContext<CatalogDbContext>(options =>
             {
-                options.UseModel(MonoSlice.Modules.Catalog.Persistence.CompiledModels.CatalogDbContextModel.Instance);
                 options.UseNpgsql(connectionString, npgsqlOptions =>
                 {
                     npgsqlOptions.MigrationsHistoryTable("__EFMigrationsHistory", CatalogDbContext.DefaultSchema);

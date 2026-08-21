@@ -153,15 +153,15 @@ src/Modules/MonoSlice.Modules.Catalog/Features/CreateProduct/
 
 ---
 
-## ⚡ Native AOT & EF Core Compiled Models
+## ⚡ Self-Contained Trimming & Native AOT Compatibility
 
-MonoSlice is fully configured for **Native AOT (Ahead-of-Time compilation)** in .NET 10, resulting in ultra-fast cold starts (~10ms) and minimal memory footprints (~35-40MB container images):
+MonoSlice is engineered with trim-safe patterns, source generation, and compile-time optimization in .NET 10:
 
 1. **Source-Generated JSON & Mediator**:
-   - `AppJsonSerializerContext` provides compile-time JSON metadata for all CQRS commands, queries, responses, and OpenAPI documentation without reflection.
-   - `Mediator.SourceGenerator` generates typed dispatch pipelines at build time.
+   - `AppJsonSerializerContext` provides compile-time JSON metadata for all CQRS commands, queries, responses, and OpenAPI schemas without runtime reflection.
+   - `Mediator.SourceGenerator` generates strongly-typed dispatch pipelines at build time.
 2. **EF Core Compiled Models**:
-   - Runtime model building is disabled in AOT mode. Compiled models are generated using `dotnet ef dbcontext optimize --nativeaot` and registered with `options.UseModel(...)`.
+   - Runtime model building overhead is eliminated with precompiled models generated via `dotnet ef dbcontext optimize` and registered using `options.UseModel(...)`.
    - To regenerate compiled models after modifying domain entities:
      ```bash
      # Users Module
@@ -170,11 +170,12 @@ MonoSlice is fully configured for **Native AOT (Ahead-of-Time compilation)** in 
      # Catalog Module
      dotnet ef dbcontext optimize --output-dir Persistence/CompiledModels --namespace MonoSlice.Modules.Catalog.Persistence.CompiledModels --context CatalogDbContext --project src/Modules/MonoSlice.Modules.Catalog/MonoSlice.Modules.Catalog.csproj --startup-project src/MonoSlice.Host/MonoSlice.Host.csproj --nativeaot
      ```
-3. **Trimmer Root Directives (`rd.xml`)**:
-   - Preserves ASP.NET Core Identity generic store/manager type definitions during trimming.
-4. **Publishing Native AOT Binary**:
+3. **Self-Contained IL Trimming (Docker Image ~60MB)**:
+   - Uses `PublishTrimmed=true` with `TrimMode=partial` to prune unused framework and assembly code while retaining full CoreCLR JIT support for dynamic LINQ queries and EF Core features.
+   - `rd.xml` (Trimmer Root Descriptor) ensures Identity and core services are preserved during trimming.
+4. **Publishing Self-Contained Binary**:
    ```bash
-   dotnet publish src/MonoSlice.Host/MonoSlice.Host.csproj -c Release -r linux-x64
+   dotnet publish src/MonoSlice.Host/MonoSlice.Host.csproj -c Release -r linux-x64 --self-contained -p:PublishTrimmed=true -p:TrimMode=partial
    ```
 
 ---

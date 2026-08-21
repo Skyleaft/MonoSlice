@@ -8,8 +8,8 @@ services:
       - "8080:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__UsersDb=Host=postgres;Port=5433;Database=monoslice_users;Username=postgres;Password=postgres
-      - ConnectionStrings__CatalogDb=Host=postgres;Port=5433;Database=monoslice_catalog;Username=postgres;Password=postgres
+      - ConnectionStrings__UsersDb=Host=postgres;Port=5432;Database=monoslice_users;Username=postgres;Password=postgres
+      - ConnectionStrings__CatalogDb=Host=postgres;Port=5432;Database=monoslice_catalog;Username=postgres;Password=postgres
       - Cache__Provider=Redis
       - Cache__Redis__ConnectionString=redis:6379
       - Messaging__Provider=RabbitMQ
