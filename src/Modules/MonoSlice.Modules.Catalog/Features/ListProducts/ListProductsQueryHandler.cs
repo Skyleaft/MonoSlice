@@ -1,3 +1,4 @@
+using Mapster;
 using Microsoft.EntityFrameworkCore;
 using MonoSlice.Modules.Catalog.Features.CreateProduct;
 using MonoSlice.Modules.Catalog.Persistence;
@@ -39,21 +40,13 @@ public sealed class ListProductsQueryHandler : IQueryHandler<ListProductsQuery, 
 
         var totalCount = await dbQuery.CountAsync(cancellationToken);
 
-        var items = await dbQuery
+        var products = await dbQuery
             .OrderByDescending(p => p.CreatedAt)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
-            .Select(p => new ProductDto(
-                p.Id,
-                p.Name,
-                p.Sku,
-                p.Description,
-                p.Price,
-                p.StockQuantity,
-                p.IsActive,
-                p.CreatedAt,
-                p.UpdatedAt))
             .ToListAsync(cancellationToken);
+
+        var items = products.Adapt<List<ProductDto>>();
 
         var paginatedList = new PaginatedList<ProductDto>(items, totalCount, pageNumber, pageSize);
         return ApiResponse.Ok(paginatedList);

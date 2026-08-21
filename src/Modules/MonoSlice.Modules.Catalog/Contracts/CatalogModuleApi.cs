@@ -1,3 +1,4 @@
+using Mapster;
 using Microsoft.EntityFrameworkCore;
 using MonoSlice.Modules.Catalog.Persistence;
 using MonoSlice.Shared.Abstractions.Contracts;
@@ -26,13 +27,7 @@ public sealed class CatalogModuleApi : ICatalogModuleApi
             return null;
         }
 
-        return new ProductContractDto(
-            product.Id,
-            product.Name,
-            product.Sku,
-            product.Price,
-            product.StockQuantity,
-            product.IsActive);
+        return product.Adapt<ProductContractDto>();
     }
 
     public async Task<bool> HasSufficientStockAsync(

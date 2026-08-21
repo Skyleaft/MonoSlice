@@ -1,3 +1,4 @@
+using Mapster;
 using Microsoft.EntityFrameworkCore;
 using MonoSlice.Modules.Orders.Features.CreateOrder;
 using MonoSlice.Modules.Orders.Persistence;
@@ -42,21 +43,7 @@ public sealed class ListOrdersQueryHandler : IQueryHandler<ListOrdersQuery, ApiR
             .Take(query.PageSize)
             .ToListAsync(cancellationToken);
 
-        var dtos = orders.Select(order => new OrderDto(
-            order.Id,
-            order.CustomerId,
-            order.Status,
-            order.TotalAmount,
-            order.Notes,
-            order.Items.Select(i => new OrderItemDto(
-                i.Id,
-                i.ProductId,
-                i.ProductName,
-                i.UnitPrice,
-                i.Quantity,
-                i.TotalPrice)).ToList(),
-            order.CreatedAt,
-            order.UpdatedAt)).ToList();
+        var dtos = orders.Adapt<List<OrderDto>>();
 
         var paginated = new PaginatedList<OrderDto>(dtos, totalCount, query.PageNumber, query.PageSize);
         return ApiResponse.Ok(paginated);

@@ -1,3 +1,4 @@
+using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MonoSlice.Modules.Catalog.Domain;
@@ -66,17 +67,7 @@ public sealed class CreateProductCommandHandler : ICommandHandler<CreateProductC
             // In a production system, an outbox pattern ensures at-least-once delivery; here we log the fault
         }
 
-        var dto = new ProductDto(
-            product.Id,
-            product.Name,
-            product.Sku,
-            product.Description,
-            product.Price,
-            product.StockQuantity,
-            product.IsActive,
-            product.CreatedAt,
-            product.UpdatedAt);
-
+        var dto = product.Adapt<ProductDto>();
         return ApiResponse.Ok(dto, "Product created successfully.");
     }
 }

@@ -1,3 +1,4 @@
+using Mapster;
 using Microsoft.EntityFrameworkCore;
 using MonoSlice.Modules.Catalog.Features.CreateProduct;
 using MonoSlice.Modules.Catalog.Persistence;
@@ -40,16 +41,7 @@ public sealed class GetProductQueryHandler : IQueryHandler<GetProductQuery, ApiR
                     throw new NotFoundException("Product", query.Id);
                 }
 
-                return new ProductDto(
-                    product.Id,
-                    product.Name,
-                    product.Sku,
-                    product.Description,
-                    product.Price,
-                    product.StockQuantity,
-                    product.IsActive,
-                    product.CreatedAt,
-                    product.UpdatedAt);
+                return product.Adapt<ProductDto>();
             },
             TimeSpan.FromMinutes(10),
             cancellationToken);

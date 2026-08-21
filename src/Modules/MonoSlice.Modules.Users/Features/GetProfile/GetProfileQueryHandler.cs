@@ -1,3 +1,4 @@
+using Mapster;
 using Microsoft.AspNetCore.Identity;
 using MonoSlice.Modules.Users.Domain;
 using MonoSlice.Modules.Users.Features.Register;
@@ -38,15 +39,7 @@ public sealed class GetProfileQueryHandler : IQueryHandler<GetProfileQuery, ApiR
 
         var roles = await _userManager.GetRolesAsync(user);
 
-        var dto = new UserResponseDto(
-            user.Id,
-            user.UserName ?? string.Empty,
-            user.Email ?? string.Empty,
-            user.FirstName,
-            user.LastName,
-            roles.ToList(),
-            user.CreatedAt);
-
+        var dto = user.Adapt<UserResponseDto>() with { Roles = roles.ToList() };
         return ApiResponse.Ok(dto);
     }
 }

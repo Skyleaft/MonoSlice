@@ -1,3 +1,4 @@
+using Mapster;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using MonoSlice.Modules.Users.Auth;
@@ -59,12 +60,7 @@ public sealed class LoginCommandHandler : ICommandHandler<LoginCommand, ApiRespo
         await _userManager.UpdateAsync(user);
 
         var expiresAt = DateTime.UtcNow.AddMinutes(_authSettings.AccessTokenExpiryMinutes);
-
-        var userInfo = new UserInfoDto(
-            user.Id,
-            user.UserName ?? string.Empty,
-            user.Email ?? string.Empty,
-            roles.ToList());
+        var userInfo = user.Adapt<UserInfoDto>() with { Roles = roles.ToList() };
 
         var responseDto = new LoginResponseDto(
             accessToken,

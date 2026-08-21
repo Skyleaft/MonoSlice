@@ -1,3 +1,4 @@
+using Mapster;
 using Microsoft.EntityFrameworkCore;
 using MonoSlice.Modules.Orders.Features.CreateOrder;
 using MonoSlice.Modules.Orders.Persistence;
@@ -30,22 +31,7 @@ public sealed class GetOrderQueryHandler : IQueryHandler<GetOrderQuery, ApiRespo
             throw new NotFoundException("Order", query.Id);
         }
 
-        var dto = new OrderDto(
-            order.Id,
-            order.CustomerId,
-            order.Status,
-            order.TotalAmount,
-            order.Notes,
-            order.Items.Select(i => new OrderItemDto(
-                i.Id,
-                i.ProductId,
-                i.ProductName,
-                i.UnitPrice,
-                i.Quantity,
-                i.TotalPrice)).ToList(),
-            order.CreatedAt,
-            order.UpdatedAt);
-
+        var dto = order.Adapt<OrderDto>();
         return ApiResponse.Ok(dto);
     }
 }

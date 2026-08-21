@@ -1,3 +1,4 @@
+using Mapster;
 using Microsoft.Extensions.Logging;
 using MonoSlice.Modules.Orders.Domain;
 using MonoSlice.Modules.Orders.Persistence;
@@ -113,22 +114,7 @@ public sealed class CreateOrderCommandHandler : ICommandHandler<CreateOrderComma
             _logger.LogInformation("Order {OrderId} enqueued for asynchronous background fulfillment processing.", order.Id);
         }
 
-        var responseDto = new OrderDto(
-            order.Id,
-            order.CustomerId,
-            order.Status,
-            order.TotalAmount,
-            order.Notes,
-            order.Items.Select(i => new OrderItemDto(
-                i.Id,
-                i.ProductId,
-                i.ProductName,
-                i.UnitPrice,
-                i.Quantity,
-                i.TotalPrice)).ToList(),
-            order.CreatedAt,
-            order.UpdatedAt);
-
+        var responseDto = order.Adapt<OrderDto>();
         return ApiResponse.Ok(responseDto, "Order created successfully and queued for asynchronous processing.");
     }
 }

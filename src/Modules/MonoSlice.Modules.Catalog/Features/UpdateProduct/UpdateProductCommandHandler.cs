@@ -1,3 +1,4 @@
+using Mapster;
 using Microsoft.EntityFrameworkCore;
 using MonoSlice.Modules.Catalog.Features.CreateProduct;
 using MonoSlice.Modules.Catalog.Persistence;
@@ -39,17 +40,7 @@ public sealed class UpdateProductCommandHandler : ICommandHandler<UpdateProductC
         // Invalidate cache
         await _cacheService.RemoveAsync($"catalog:products:{command.Id}", cancellationToken);
 
-        var dto = new ProductDto(
-            product.Id,
-            product.Name,
-            product.Sku,
-            product.Description,
-            product.Price,
-            product.StockQuantity,
-            product.IsActive,
-            product.CreatedAt,
-            product.UpdatedAt);
-
+        var dto = product.Adapt<ProductDto>();
         return ApiResponse.Ok(dto, "Product updated successfully.");
     }
 }

@@ -1,3 +1,4 @@
+using Mapster;
 using Microsoft.AspNetCore.Identity;
 using MonoSlice.Modules.Users.Domain;
 using MonoSlice.Shared.Abstractions.Common;
@@ -40,15 +41,7 @@ public sealed class RegisterCommandHandler : ICommandHandler<RegisterCommand, Ap
 
         await _userManager.AddToRoleAsync(user, "User");
 
-        var responseDto = new UserResponseDto(
-            user.Id,
-            user.UserName ?? string.Empty,
-            user.Email ?? string.Empty,
-            user.FirstName,
-            user.LastName,
-            ["User"],
-            user.CreatedAt);
-
+        var responseDto = user.Adapt<UserResponseDto>() with { Roles = ["User"] };
         return ApiResponse.Ok(responseDto, "User registered successfully.");
     }
 }
