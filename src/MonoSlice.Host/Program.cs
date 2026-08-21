@@ -108,7 +108,6 @@ app.MapOpenApi();
 app.MapScalarApiReference(options =>
 {
     options.Title = "MonoSlice API Reference";
-    options.Theme = ScalarTheme.Mars;
     options.ShowSidebar = true;
 });
 

@@ -10,7 +10,7 @@ public static class DeleteProductEndpoint
 {
     public static void MapDeleteProductEndpoint(this IEndpointRouteBuilder app)
     {
-        app.MapDelete("/api/catalog/products/{id:guid}", async (
+        app.MapDelete("/{id:guid}", async (
             Guid id,
             IMediator mediator,
             CancellationToken cancellationToken) =>

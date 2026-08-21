@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -56,11 +57,14 @@ public static class CatalogModule
         var dispatcher = app.ServiceProvider.GetService<IIntegrationEventDispatcher>();
         dispatcher?.RegisterEvent<ProductCreatedIntegrationEvent>();
 
-        app.MapCreateProductEndpoint();
-        app.MapGetProductEndpoint();
-        app.MapListProductsEndpoint();
-        app.MapUpdateProductEndpoint();
-        app.MapDeleteProductEndpoint();
+        var group = app.MapGroup("/api/catalog/products")
+            .WithTags("Catalog");
+
+        group.MapCreateProductEndpoint();
+        group.MapGetProductEndpoint();
+        group.MapListProductsEndpoint();
+        group.MapUpdateProductEndpoint();
+        group.MapDeleteProductEndpoint();
 
         return app;
     }

@@ -11,7 +11,7 @@ public static class GetProfileEndpoint
 {
     public static void MapGetProfileEndpoint(this IEndpointRouteBuilder app)
     {
-        app.MapGet("/api/users/me", async (
+        app.MapGet("/me", async (
             IMediator mediator,
             CancellationToken cancellationToken) =>
         {

@@ -11,7 +11,7 @@ public static class UpdateProductEndpoint
 {
     public static void MapUpdateProductEndpoint(this IEndpointRouteBuilder app)
     {
-        app.MapPut("/api/catalog/products/{id:guid}", async (
+        app.MapPut("/{id:guid}", async (
             Guid id,
             UpdateProductCommand command,
             IMediator mediator,

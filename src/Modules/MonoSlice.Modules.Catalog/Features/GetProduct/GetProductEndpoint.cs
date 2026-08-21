@@ -11,7 +11,7 @@ public static class GetProductEndpoint
 {
     public static void MapGetProductEndpoint(this IEndpointRouteBuilder app)
     {
-        app.MapGet("/api/catalog/products/{id:guid}", async (
+        app.MapGet("/{id:guid}", async (
             Guid id,
             IMediator mediator,
             CancellationToken cancellationToken) =>

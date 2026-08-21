@@ -10,7 +10,7 @@ public static class AssignRoleEndpoint
 {
     public static void MapAssignRoleEndpoint(this IEndpointRouteBuilder app)
     {
-        app.MapPost("/api/users/assign-role", async (
+        app.MapPost("/assign-role", async (
             AssignRoleCommand command,
             IMediator mediator,
             CancellationToken cancellationToken) =>

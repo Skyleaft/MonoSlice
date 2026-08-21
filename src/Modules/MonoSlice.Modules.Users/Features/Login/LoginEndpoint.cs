@@ -15,7 +15,7 @@ public static class LoginEndpoint
 {
     public static void MapLoginEndpoint(this IEndpointRouteBuilder app)
     {
-        app.MapPost("/api/users/login", async (
+        app.MapPost("/login", async (
             LoginCommand command,
             IMediator mediator,
             HttpContext httpContext,
@@ -44,7 +44,7 @@ public static class LoginEndpoint
         .Produces<ApiResponse>(StatusCodes.Status400BadRequest)
         .AllowAnonymous();
 
-        app.MapPost("/api/users/logout", async (
+        app.MapPost("/logout", async (
             SignInManager<ApplicationUser> signInManager,
             HttpContext httpContext) =>
         {

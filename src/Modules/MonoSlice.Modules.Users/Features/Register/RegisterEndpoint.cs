@@ -10,7 +10,7 @@ public static class RegisterEndpoint
 {
     public static void MapRegisterEndpoint(this IEndpointRouteBuilder app)
     {
-        app.MapPost("/api/users/register", async (RegisterCommand command, IMediator mediator, CancellationToken cancellationToken) =>
+        app.MapPost("/register", async (RegisterCommand command, IMediator mediator, CancellationToken cancellationToken) =>
         {
             var result = await mediator.Send(command, cancellationToken);
             return Results.Ok(result);

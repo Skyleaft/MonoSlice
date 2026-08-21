@@ -10,7 +10,7 @@ public static class RefreshTokenEndpoint
 {
     public static void MapRefreshTokenEndpoint(this IEndpointRouteBuilder app)
     {
-        app.MapPost("/api/users/refresh-token", async (
+        app.MapPost("/refresh-token", async (
             RefreshTokenCommand command,
             IMediator mediator,
             CancellationToken cancellationToken) =>

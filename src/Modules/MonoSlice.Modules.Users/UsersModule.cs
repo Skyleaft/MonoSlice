@@ -1,6 +1,7 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
@@ -110,11 +111,14 @@ public static class UsersModule
 
     public static IEndpointRouteBuilder MapUsersEndpoints(this IEndpointRouteBuilder app)
     {
-        app.MapRegisterEndpoint();
-        app.MapLoginEndpoint();
-        app.MapRefreshTokenEndpoint();
-        app.MapGetProfileEndpoint();
-        app.MapAssignRoleEndpoint();
+        var group = app.MapGroup("/api/users")
+            .WithTags("Users");
+
+        group.MapRegisterEndpoint();
+        group.MapLoginEndpoint();
+        group.MapRefreshTokenEndpoint();
+        group.MapGetProfileEndpoint();
+        group.MapAssignRoleEndpoint();
 
         return app;
     }

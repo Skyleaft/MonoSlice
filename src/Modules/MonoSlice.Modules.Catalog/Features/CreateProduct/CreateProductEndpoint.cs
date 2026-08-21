@@ -10,7 +10,7 @@ public static class CreateProductEndpoint
 {
     public static void MapCreateProductEndpoint(this IEndpointRouteBuilder app)
     {
-        app.MapPost("/api/catalog/products", async (
+        app.MapPost("/", async (
             CreateProductCommand command,
             IMediator mediator,
             CancellationToken cancellationToken) =>

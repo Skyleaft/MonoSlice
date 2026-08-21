@@ -12,7 +12,7 @@ public static class ListProductsEndpoint
 {
     public static void MapListProductsEndpoint(this IEndpointRouteBuilder app)
     {
-        app.MapGet("/api/catalog/products", async (
+        app.MapGet("/", async (
             [FromQuery] int? pageNumber,
             [FromQuery] int? pageSize,
             [FromQuery] string? search,
