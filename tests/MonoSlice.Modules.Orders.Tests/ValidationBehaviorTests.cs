@@ -63,8 +63,42 @@ public sealed class ValidationBehaviorTests
         Assert.False(nextCalled);
         Assert.False(result.Success);
         Assert.Equal(400, result.StatusCode);
+        Assert.Equal(400, result.Status);
+        Assert.Equal("Validation Error", result.Title);
+        Assert.Equal(ProblemTypes.ValidationError, result.Type);
+        Assert.Equal("Validation.Error", result.Code);
         Assert.NotNull(result.Errors);
         Assert.NotEmpty(result.Errors);
+        Assert.True(result.Errors.ContainsKey("Name"));
+        Assert.True(result.Errors.ContainsKey("Age"));
+        Assert.NotNull(result.ErrorList);
+        Assert.Contains("Name is required.", result.ErrorList);
+    }
+
+    [Fact]
+    public async Task Handle_InvalidMessage_WithResult_ReturnsResultFailureWithValidationErrors()
+    {
+        // Arrange
+        var behavior = new MonoSlice.Shared.Infrastructure.Behaviors.ValidationBehavior<ValidatableCommand, Result<string>>();
+        var invalidCommand = new ValidatableCommand { Name = "", Age = -5 };
+
+        var nextCalled = false;
+        MessageHandlerDelegate<ValidatableCommand, Result<string>> next = (msg, ct) =>
+        {
+            nextCalled = true;
+            return ValueTask.FromResult(Result<string>.Success("Should not be called"));
+        };
+
+        // Act
+        var result = await behavior.Handle(invalidCommand, next, CancellationToken.None);
+
+        // Assert
+        Assert.False(nextCalled);
+        Assert.True(result.IsFailure);
+        Assert.Equal(ErrorType.Validation, result.Error.Type);
+        Assert.NotNull(result.ValidationErrors);
+        Assert.True(result.ValidationErrors.ContainsKey("Name"));
+        Assert.True(result.ValidationErrors.ContainsKey("Age"));
     }
 
     [Fact]
@@ -81,5 +115,9 @@ public sealed class ValidationBehaviorTests
             behavior.Handle(invalidCommand, next, CancellationToken.None).AsTask());
 
         Assert.NotEmpty(ex.Errors);
+        Assert.Equal(400, ex.StatusCode);
+        Assert.Equal("Validation Error", ex.Title);
+        Assert.Equal(ProblemTypes.ValidationError, ex.Type);
+        Assert.True(ex.Errors.ContainsKey("Title"));
     }
 }

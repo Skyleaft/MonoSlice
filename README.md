@@ -4,6 +4,7 @@
 
 [![.NET 10](https://img.shields.io/badge/.NET-10.0-purple.svg)](https://dotnet.microsoft.com/)
 [![Architecture](https://img.shields.io/badge/Architecture-Vertical%20Slice%20%2B%20DDD-blue.svg)](#architecture-overview)
+[![RFC 7807 / RFC 9457](https://img.shields.io/badge/RFC-7807%20%2F%209457%20Problem%20Details-orange.svg)](#standardized-api-responses--problem-details-rfc-7807--rfc-9457)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 ---
@@ -14,7 +15,7 @@
 - **🍰 Vertical Slice Architecture**: Features are organized by feature folder (Commands, Queries, Handlers, Endpoints, DTOs in one place) instead of technical layers.
 - **🏰 Domain-Driven Design (DDD)**: Rich domain models, `AggregateRoot<TId>`, `Entity<TId>`, domain events, and repository/unit-of-work patterns.
 - **⚡ AOT Build Friendly**: Uses compile-time source generation with **`Mediator.SourceGenerator`** and trim-safe patterns to minimize reflection.
-- **🐘 PostgreSQL + EF Core**: Module-isolated `DbContext` per domain with automatic schema separation (`users`, `catalog`) and audit timestamp handling.
+- **🐘 PostgreSQL + EF Core**: Module-isolated `DbContext` per domain with automatic schema separation (`users`, `catalog`, `orders`) and audit timestamp handling.
 - **🐰 Native Messaging (RabbitMQ / Kafka / InMemory)**: Native publisher and background consumer implementations without MassTransit, dynamically switchable via environment variables (supports `RabbitMQ`, `Kafka`, or `InMemory`).
 - **🔐 Hybrid Authentication & Authorization**:
   - ASP.NET Core Identity with **GuidV7** (`Guid.CreateVersion7()`) keys.
@@ -25,8 +26,11 @@
 - **💾 Dual Caching Support**: Seamlessly switch between in-memory cache and **Redis** distributed cache via configuration.
 - **🔭 OpenTelemetry & Jaeger**: Distributed tracing, metrics, and structured logs with OTLP exporter integration.
 - **📜 Scalar OpenAPI UI**: Beautiful, interactive API documentation replacing default Swagger.
-- **🛡️ DataAnnotations Validation**: Fast request validation executed via Mediator pipeline behavior.
-- **📦 Standardized API Responses**: Every response wrapped in `ApiResponse<T>` with consistent error codes and validation details.
+- **🛡️ Standardized Error & Response Structure (RFC 7807 / RFC 9457)**:
+  - Strong Result Pattern (`Result`, `Result<T>`, `Error`, `ErrorType`) avoiding unnecessary exceptions.
+  - Uniform `ApiResponse<T>` envelope for successful responses.
+  - RFC 7807 / RFC 9457 compliant `application/problem+json` Problem Details for client and server errors.
+  - Pipeline validation behavior (`ValidationBehavior`) returning structured field-level validation dictionaries without throwing exceptions.
 - **🐳 Docker & Docker Compose**: Complete setup including API, PostgreSQL 17, RabbitMQ Management, Redis, and Jaeger.
 
 ---
@@ -38,8 +42,8 @@ MonoSlice/
 ├── src/
 │   ├── MonoSlice.Host/                    # Composition root & API host
 │   ├── MonoSlice.Shared/
-│   │   ├── MonoSlice.Shared.Abstractions/ # Core interfaces, CQRS, DDD base types, Contracts, Events
-│   │   └── MonoSlice.Shared.Infrastructure/ # Caching, Messaging, Middleware, Behaviors
+│   │   ├── MonoSlice.Shared.Abstractions/ # Core interfaces, CQRS, DDD base types, Contracts, Events, Result/Error
+│   │   └── MonoSlice.Shared.Infrastructure/ # Caching, Messaging, Middleware, Behaviors, Serialization
 │   └── Modules/
 │       ├── MonoSlice.Modules.Users/       # Identity, JWT, Cookie auth, Role management & UsersModuleApi
 │       ├── MonoSlice.Modules.Catalog/     # Catalog domain, stock management, CatalogModuleApi & async consumers
@@ -73,6 +77,71 @@ MonoSlice demonstrates three distinct patterns of decoupling and communication:
 
 ---
 
+## 📋 Standardized API Responses & Problem Details (RFC 7807 / RFC 9457)
+
+MonoSlice strictly follows **RFC 7807** and **RFC 9457** standards for error representation and API responses:
+
+### 1. Success Response Structure (`ApiResponse<T>`)
+```json
+{
+  "success": true,
+  "status": 200,
+  "message": "Product retrieved successfully.",
+  "data": {
+    "id": "01918a3b-272e-7448-9366-419bcfbd0655",
+    "name": "Mechanical Keyboard",
+    "sku": "KB-MEC-01",
+    "price": 129.99,
+    "stock": 45
+  }
+}
+```
+
+### 2. Validation Failure (RFC 7807 / RFC 9457 `application/problem+json`)
+Returned automatically by `ValidationBehavior` when input DataAnnotations fail, without throwing unhandled exceptions:
+```json
+{
+  "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+  "title": "Validation Error",
+  "status": 400,
+  "detail": "Validation failed.",
+  "instance": "/api/catalog/products",
+  "code": "Validation.Error",
+  "traceId": "00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01",
+  "errors": {
+    "Name": ["Name is required."],
+    "Price": ["Price must be greater than zero."]
+  },
+  "success": false
+}
+```
+
+### 3. Domain & Server Error (RFC 7807 / RFC 9457)
+Handled globally by `ExceptionHandlingMiddleware`:
+```json
+{
+  "type": "https://tools.ietf.org/html/rfc9110#section-15.5.5",
+  "title": "Not Found",
+  "status": 404,
+  "detail": "Entity 'Product' with key '01918a3b-272e-7448-9366-419bcfbd0655' was not found.",
+  "instance": "/api/catalog/products/01918a3b-272e-7448-9366-419bcfbd0655",
+  "code": "Product.NotFound",
+  "traceId": "00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01",
+  "success": false
+}
+```
+
+### 4. Result Pattern & Categorized Errors
+Handlers return `Result` or `Result<T>` containing typed `Error` objects with semantic `ErrorType`:
+- `ErrorType.Validation` (400)
+- `ErrorType.Unauthorized` (401)
+- `ErrorType.Forbidden` (403)
+- `ErrorType.NotFound` (404)
+- `ErrorType.Conflict` (409)
+- `ErrorType.Failure` / `Critical` (500)
+
+---
+
 ## 🚀 Getting Started
 
 ### Prerequisites
@@ -89,7 +158,10 @@ dotnet build
 
 ### 2. Run Tests
 ```bash
-dotnet test
+# Run all module test suites
+dotnet run --project tests/MonoSlice.Modules.Users.Tests/MonoSlice.Modules.Users.Tests.csproj
+dotnet run --project tests/MonoSlice.Modules.Catalog.Tests/MonoSlice.Modules.Catalog.Tests.csproj
+dotnet run --project tests/MonoSlice.Modules.Orders.Tests/MonoSlice.Modules.Orders.Tests.csproj
 ```
 
 ### 3. Run with Docker Compose (Recommended)
@@ -157,6 +229,8 @@ Every setting can be overridden via environment variables or `.env`:
 | `GET` | `/api/orders` | List orders with pagination and status filter | Anonymous |
 | `POST` | `/api/orders/{id}/process-async` | Trigger async background fulfillment job | Anonymous |
 | `POST` | `/api/orders/{id}/cancel` | Cancel a pending/processing order | Anonymous |
+| `GET` | `/api/orders/analytics` | High-performance aggregate analytics via Dapper | Admin, Manager |
+| `GET` | `/api/orders/analytics/customer/{customerId}` | Individual customer order analytics via Dapper | Authorized |
 
 ---
 
@@ -178,7 +252,7 @@ src/Modules/MonoSlice.Modules.Catalog/Features/CreateProduct/
 MonoSlice is engineered with trim-safe patterns, source generation, and compile-time optimization in .NET 10:
 
 1. **Source-Generated JSON & Mediator**:
-   - `AppJsonSerializerContext` provides compile-time JSON metadata for all CQRS commands, queries, responses, and OpenAPI schemas without runtime reflection.
+   - `AppJsonSerializerContext` and `SharedJsonSerializerContext` provide compile-time JSON metadata for all CQRS commands, queries, responses, and OpenAPI schemas without runtime reflection.
    - `Mediator.SourceGenerator` generates strongly-typed dispatch pipelines at build time.
 2. **EF Core Compiled Models**:
    - Runtime model building overhead is eliminated with precompiled models generated via `dotnet ef dbcontext optimize` and registered using `options.UseModel(...)`.
@@ -206,12 +280,8 @@ MonoSlice is engineered with trim-safe patterns, source generation, and compile-
 - **Domain Tests**: Verify domain model invariants, state transitions, and domain events.
 - **Integration Tests**: End-to-end API testing using `WebApplicationFactory<Program>` without external infrastructure dependencies.
 
-```bash
-# Run all tests
-dotnet test --logger "console;verbosity=normal"
-```
-
 ---
 
 ## 📄 License
 This project is licensed under the [MIT License](LICENSE).
+

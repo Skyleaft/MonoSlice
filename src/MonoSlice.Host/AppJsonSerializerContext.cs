@@ -82,6 +82,12 @@ namespace MonoSlice.Host;
 [JsonSerializable(typeof(string[]))]
 [JsonSerializable(typeof(List<string>))]
 [JsonSerializable(typeof(IReadOnlyList<string>))]
+[JsonSerializable(typeof(Dictionary<string, string[]>))]
+[JsonSerializable(typeof(IReadOnlyDictionary<string, string[]>))]
+[JsonSerializable(typeof(Result))]
+[JsonSerializable(typeof(Result<string>))]
+[JsonSerializable(typeof(Error))]
+[JsonSerializable(typeof(ErrorType))]
 [JsonSourceGenerationOptions(
     PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase,
     DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull)]
