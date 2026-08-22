@@ -15,7 +15,7 @@
 - **🏰 Domain-Driven Design (DDD)**: Rich domain models, `AggregateRoot<TId>`, `Entity<TId>`, domain events, and repository/unit-of-work patterns.
 - **⚡ AOT Build Friendly**: Uses compile-time source generation with **`Mediator.SourceGenerator`** and trim-safe patterns to minimize reflection.
 - **🐘 PostgreSQL + EF Core**: Module-isolated `DbContext` per domain with automatic schema separation (`users`, `catalog`) and audit timestamp handling.
-- **🐰 Native Messaging (RabbitMQ / Kafka)**: Native publisher and background consumer implementations without MassTransit, dynamically switchable via environment variables.
+- **🐰 Native Messaging (RabbitMQ / Kafka / InMemory)**: Native publisher and background consumer implementations without MassTransit, dynamically switchable via environment variables (supports `RabbitMQ`, `Kafka`, or `InMemory`).
 - **🔐 Hybrid Authentication & Authorization**:
   - ASP.NET Core Identity with **GuidV7** (`Guid.CreateVersion7()`) keys.
   - Custom **Composite Auth Middleware** supporting both **JWT Bearer** tokens and **Cookie Authentication**.
@@ -121,7 +121,7 @@ Every setting can be overridden via environment variables or `.env`:
 | `Auth__EnableCookieAuth` | `true` | Enables cookie-based fallback authentication |
 | `Cache__Provider` | `Memory` | Cache backend: `Memory` or `Redis` |
 | `Cache__Redis__ConnectionString` | `localhost:6379` | Redis connection string (if Provider is Redis) |
-| `Messaging__Provider` | `RabbitMQ` | Event broker: `RabbitMQ` or `Kafka` |
+| `Messaging__Provider` | `RabbitMQ` | Event broker: `RabbitMQ`, `Kafka`, or `InMemory` |
 | `Messaging__RabbitMQ__Host` | `localhost` | RabbitMQ server hostname |
 | `Messaging__Kafka__BootstrapServers` | `localhost:9092` | Kafka broker servers list |
 | `OpenTelemetry__Endpoint` | `http://localhost:4317` | OTLP gRPC collector endpoint (e.g. Jaeger) |
