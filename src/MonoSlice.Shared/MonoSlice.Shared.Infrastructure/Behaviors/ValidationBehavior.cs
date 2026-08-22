@@ -17,6 +17,38 @@ public sealed class ValidationBehavior<TMessage, TResponse> : IPipelineBehavior<
         MessageHandlerDelegate<TMessage, TResponse> next,
         CancellationToken cancellationToken)
     {
+        // 1. Compile-Time Sannr Validation (AOT & Trim-Safe)
+        if (message is not null && Sannr.SannrValidatorRegistry.TryGetValidator(typeof(TMessage), out var sannrValidator))
+        {
+            var sannrContext = new Sannr.SannrValidationContext(message, serviceProvider: null, items: null, group: null);
+            var sannrResult = await sannrValidator(sannrContext);
+
+            if (sannrResult is not null && !sannrResult.IsValid)
+            {
+                var validationErrors = sannrResult.Errors
+                    .GroupBy(e => string.IsNullOrWhiteSpace(e.MemberName) ? "General" : e.MemberName)
+                    .ToDictionary(
+                        g => g.Key,
+                        g => g.Select(x => x.Message).Distinct().ToArray(),
+                        StringComparer.OrdinalIgnoreCase);
+
+                if (TryCreateValidationFailureResult(validationErrors, out var failureResponse))
+                {
+                    return failureResponse;
+                }
+
+                throw new ValidationException(validationErrors, "Validation failed.");
+            }
+
+            return await next(message, cancellationToken);
+        }
+
+        if (message is null)
+        {
+            return await next(message!, cancellationToken);
+        }
+
+        // 2. Fallback to System.ComponentModel.DataAnnotations
         var context = new ValidationContext(message, serviceProvider: null, items: null);
         var validationResults = new List<ValidationResult>();
 

@@ -1,11 +1,11 @@
-using System.ComponentModel.DataAnnotations;
+using Sannr;
 using MonoSlice.Modules.Orders.Domain;
 using MonoSlice.Shared.Abstractions.Common;
 using MonoSlice.Shared.Abstractions.CQRS;
 
 namespace MonoSlice.Modules.Orders.Features.CreateOrder;
 
-public sealed record CreateOrderItemDto
+public sealed partial class CreateOrderItemDto
 {
     [Required]
     public Guid ProductId { get; init; }
@@ -22,15 +22,15 @@ public sealed record CreateOrderItemDto
     }
 }
 
-public sealed record CreateOrderCommand : ICommand<ApiResponse<OrderDto>>
+public sealed partial class CreateOrderCommand : ICommand<ApiResponse<OrderDto>>
 {
     [Required]
     public Guid CustomerId { get; init; }
 
-    [Required, MinLength(1, ErrorMessage = "Order must contain at least one item.")]
+    [Required]
     public List<CreateOrderItemDto> Items { get; init; } = [];
 
-    [MaxLength(500)]
+    [StringLength(500)]
     public string? Notes { get; init; }
 
     public bool AutoProcessAsync { get; init; } = true;

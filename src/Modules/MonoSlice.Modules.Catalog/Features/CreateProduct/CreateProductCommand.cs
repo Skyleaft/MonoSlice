@@ -1,17 +1,17 @@
-using System.ComponentModel.DataAnnotations;
+using Sannr;
 using MonoSlice.Shared.Abstractions.Common;
 using MonoSlice.Shared.Abstractions.CQRS;
 
 namespace MonoSlice.Modules.Catalog.Features.CreateProduct;
 
-public sealed record CreateProductCommand : ICommand<ApiResponse<ProductDto>>
+public sealed partial class CreateProductCommand : ICommand<ApiResponse<ProductDto>>
 {
     [Required]
-    [MaxLength(200)]
+    [StringLength(200)]
     public string Name { get; init; } = string.Empty;
 
     [Required]
-    [MaxLength(50)]
+    [StringLength(50)]
     public string Sku { get; init; } = string.Empty;
 
     [Range(0.01, 1_000_000)]
@@ -20,7 +20,7 @@ public sealed record CreateProductCommand : ICommand<ApiResponse<ProductDto>>
     [Range(0, 1_000_000)]
     public int StockQuantity { get; init; }
 
-    [MaxLength(1000)]
+    [StringLength(1000)]
     public string? Description { get; init; }
 }
 

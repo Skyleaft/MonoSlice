@@ -1,22 +1,23 @@
-using System.ComponentModel.DataAnnotations;
+using Sannr;
 using MonoSlice.Shared.Abstractions.Common;
 using MonoSlice.Shared.Abstractions.CQRS;
 
 namespace MonoSlice.Modules.Users.Features.Register;
 
-public sealed record RegisterCommand : ICommand<ApiResponse<UserResponseDto>>
+public sealed partial class RegisterCommand : ICommand<ApiResponse<UserResponseDto>>
 {
     [Required]
     [EmailAddress]
+    [Sanitize(ToLower =  true)]
     public string Email { get; init; } = string.Empty;
 
     [Required]
-    [MinLength(3)]
-    [MaxLength(50)]
+    [Sanitize(Trim =  true)]
+    [StringLength(50, MinimumLength = 3)]
     public string UserName { get; init; } = string.Empty;
 
     [Required]
-    [MinLength(6)]
+    [StringLength(100, MinimumLength = 6)]
     public string Password { get; init; } = string.Empty;
 
     public string? FirstName { get; init; }

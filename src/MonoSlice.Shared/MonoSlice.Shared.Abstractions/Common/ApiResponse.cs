@@ -42,8 +42,13 @@ public interface IApiResponse
 public class ApiResponse : IApiResponse
 {
     public bool Success { get; init; } = true;
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? Type { get; init; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? Title { get; init; }
+
     public int Status { get; init; } = 200;
 
     [JsonIgnore]
@@ -53,19 +58,29 @@ public class ApiResponse : IApiResponse
         init => Status = value;
     }
 
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? Detail { get; init; }
 
+    [JsonIgnore]
     public string? Message
     {
         get => Detail;
         init => Detail = value;
     }
 
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? Instance { get; init; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? Code { get; init; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? TraceId { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public IReadOnlyDictionary<string, string[]>? Errors { get; init; }
 
+    [JsonIgnore]
     public IReadOnlyList<string>? ErrorList
     {
         get
@@ -321,9 +336,16 @@ public class ApiResponse : IApiResponse
 public class ApiResponse<T> : IApiResponse
 {
     public bool Success { get; init; } = true;
+    
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public T? Data { get; init; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? Type { get; init; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? Title { get; init; }
+
     public int Status { get; init; } = 200;
 
     [JsonIgnore]
@@ -333,19 +355,29 @@ public class ApiResponse<T> : IApiResponse
         init => Status = value;
     }
 
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? Detail { get; init; }
 
+    [JsonIgnore]
     public string? Message
     {
         get => Detail;
         init => Detail = value;
     }
 
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? Instance { get; init; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? Code { get; init; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? TraceId { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public IReadOnlyDictionary<string, string[]>? Errors { get; init; }
 
+    [JsonIgnore]
     public IReadOnlyList<string>? ErrorList
     {
         get

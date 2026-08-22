@@ -79,4 +79,37 @@ public class CreateProductCommandHandlerTests
         await Assert.ThrowsAsync<BusinessRuleException>(() =>
             _handler.Handle(command, CancellationToken.None).AsTask());
     }
+
+    [Fact]
+    public async Task ValidationBehavior_ShouldReturnValidationFailure_WhenCreateProductCommandIsInvalid()
+    {
+        // Arrange
+        var behavior = new MonoSlice.Shared.Infrastructure.Behaviors.ValidationBehavior<CreateProductCommand, MonoSlice.Shared.Abstractions.Common.ApiResponse<ProductDto>>();
+        var invalidCommand = new CreateProductCommand
+        {
+            Name = "", // Required
+            Sku = "",  // Required
+            Price = -10m // Range(0.01, 1,000,000)
+        };
+
+        var nextCalled = false;
+        Mediator.MessageHandlerDelegate<CreateProductCommand, MonoSlice.Shared.Abstractions.Common.ApiResponse<ProductDto>> next =
+            (cmd, ct) =>
+            {
+                nextCalled = true;
+                return ValueTask.FromResult(MonoSlice.Shared.Abstractions.Common.ApiResponse.Ok<ProductDto>(null!));
+            };
+
+        // Act
+        var response = await behavior.Handle(invalidCommand, next, CancellationToken.None);
+
+        // Assert
+        Assert.False(nextCalled);
+        Assert.False(response.Success);
+        Assert.Equal(400, response.StatusCode);
+        Assert.NotNull(response.Errors);
+        Assert.True(response.Errors.ContainsKey("Name"));
+        Assert.True(response.Errors.ContainsKey("Sku"));
+        Assert.True(response.Errors.ContainsKey("Price"));
+    }
 }

@@ -25,12 +25,12 @@
 - **🗺️ Mapster Mapping**: Fast, compile-time adaptable object mapping.
 - **💾 Dual Caching Support**: Seamlessly switch between in-memory cache and **Redis** distributed cache via configuration.
 - **🔭 OpenTelemetry & Jaeger**: Distributed tracing, metrics, and structured logs with OTLP exporter integration.
-- **📜 Scalar OpenAPI UI**: Beautiful, interactive API documentation replacing default Swagger.
+- **⚡ Sannr AOT-First Validation**: Uses **[Sannr](https://github.com/Digvijay/Sannr)** compile-time Roslyn source generators for zero-reflection, trim-safe request validation up to 20x faster with 95% less memory than runtime DataAnnotations.
 - **🛡️ Standardized Error & Response Structure (RFC 7807 / RFC 9457)**:
   - Strong Result Pattern (`Result`, `Result<T>`, `Error`, `ErrorType`) avoiding unnecessary exceptions.
   - Uniform `ApiResponse<T>` envelope for successful responses.
   - RFC 7807 / RFC 9457 compliant `application/problem+json` Problem Details for client and server errors.
-  - Pipeline validation behavior (`ValidationBehavior`) returning structured field-level validation dictionaries without throwing exceptions.
+  - Pipeline validation behavior (`ValidationBehavior`) leveraging Sannr's `SannrValidatorRegistry` and returning structured field-level validation dictionaries without throwing exceptions.
 - **🐳 Docker & Docker Compose**: Complete setup including API, PostgreSQL 17, RabbitMQ Management, Redis, and Jaeger.
 
 ---

@@ -8,4 +8,8 @@
     <InvariantGlobalization>false</InvariantGlobalization>
     <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Sannr" />
+  </ItemGroup>
 </Project>

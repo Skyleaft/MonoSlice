@@ -8,9 +8,11 @@ using MonoSlice.Modules.Orders;
 using MonoSlice.Modules.Orders.Persistence;
 using MonoSlice.Modules.Users;
 using MonoSlice.Modules.Users.Persistence;
+using MonoSlice.Shared.Abstractions.Common;
 using MonoSlice.Shared.Infrastructure;
 using MonoSlice.Shared.Infrastructure.Mapping;
 using MonoSlice.Shared.Infrastructure.Telemetry;
+using Sannr.AspNetCore;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,6 +28,14 @@ builder.Logging.AddMonoSliceOtelLogging(builder.Configuration);
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
     options.SerializerOptions.TypeInfoResolverChain.Insert(0, MonoSlice.Host.AppJsonSerializerContext.Default);
+});
+
+// Add Sannr Validation
+builder.Services.AddSannr(options =>
+{
+    options.EnableEnhancedErrorResponses = true;
+    options.IncludeValidationRuleMetadata = true;
+    options.IncludeValidationDuration = false;
 });
 
 // OpenAPI & Scalar Documentation

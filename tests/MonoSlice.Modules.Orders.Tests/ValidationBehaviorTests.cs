@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+using Sannr;
 using Mediator;
 using MonoSlice.Shared.Abstractions.Common;
 using ValidationException = MonoSlice.Shared.Abstractions.Exceptions.ValidationException;
@@ -6,21 +6,29 @@ using Xunit;
 
 namespace MonoSlice.Modules.Orders.Tests;
 
+public sealed partial class ValidatableCommand : IMessage
+{
+    [Required(ErrorMessage = "Name is required.")]
+    public string Name { get; set; } = string.Empty;
+
+    [Range(1, 100, ErrorMessage = "Age must be between 1 and 100.")]
+    public int Age { get; set; }
+}
+
+public sealed partial class NonResultCommand : IMessage
+{
+    [Required(ErrorMessage = "Title is required.")]
+    public string Title { get; set; } = string.Empty;
+}
+
 public sealed class ValidationBehaviorTests
 {
-    private sealed class ValidatableCommand : IMessage
+    [Fact]
+    public void SannrValidatorRegistry_HasRegisteredValidator_ForValidatableCommand()
     {
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Name is required.")]
-        public string Name { get; set; } = string.Empty;
-
-        [Range(1, 100, ErrorMessage = "Age must be between 1 and 100.")]
-        public int Age { get; set; }
-    }
-
-    private sealed class NonResultCommand : IMessage
-    {
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Title is required.")]
-        public string Title { get; set; } = string.Empty;
+        var found = SannrValidatorRegistry.TryGetValidator(typeof(ValidatableCommand), out var validator);
+        Assert.True(found);
+        Assert.NotNull(validator);
     }
 
     [Fact]
